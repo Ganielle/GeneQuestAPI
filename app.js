@@ -6,6 +6,8 @@ const http = require("http");
 const cors = require("cors");
 require("dotenv").config();
 
+const {initserver} = require("./Initialize/init")
+
 const app = express();
 
 //  Uncomment when you created initialize function for the server
@@ -31,7 +33,7 @@ mongoose
   })
   .then(() => {
     //  Uncomment when you created initialize function for the server
-    // initialize();
+    initserver();
     console.log("MongoDB Connected");
   })
   .catch((err) => console.log(err));

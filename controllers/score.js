@@ -1,6 +1,7 @@
 const { default: mongoose } = require("mongoose")
 const Scores = require("../models/Score")
 const Unlock = require("../models/Unlock")
+const Stagescore = require("../models/Stagescore")
 
 exports.savescore = async (req, res) => {
     const {id, username} = req.user
@@ -81,19 +82,35 @@ exports.savescore = async (req, res) => {
 }
 
 exports.getscore = async (req, res) => {
-    const {id, username} = req.user
+    const {id} = req.user
 
-    const {song} = req.query
+    const {level, studentid} = req.query
 
-    if (!song){
-        return res.status(400).json({message: "failed", data: "Select a valid song!"})
+    const result = await Stagescore.find({owner: new mongoose.Types.ObjectId(studentid), level: level})
+    .sort({ amount: -1 })
+
+    const data = {
+        stage1: {
+            score: 0
+        },
+        stage2: {
+            score: 0
+        },
+        stage3: {
+            score: 0
+        },
+        stage4: {
+            score: 0
+        }
     }
 
-    const result = await Scores.find({owner: new mongoose.Types.ObjectId(id), song: song})
-    .sort({ amount: -1 })
-    .limit(1) 
+    result.forEach(tempdata => {
+        const {stage, level, score} = tempdata
 
-    return res.json({message: "success", data: result.length <= 0 ? 0 : result[0].amount})
+        data[`stage${stage}`]["score"] = score
+    })
+
+    return res.json({message: "success", data: data})
 }
 
 exports.getleaderboard = async (req, res) => {
