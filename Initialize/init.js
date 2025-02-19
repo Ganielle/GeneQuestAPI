@@ -4,7 +4,7 @@ exports.initserver = async() => {
 
     console.log("Starting init server")
 
-    const admin = await Staffusers.findOne({username: "genequestadmin", password: "3dN6Ix5YPmKm"})
+    const admin = await Staffusers.findOne({username: "genequestadmin"})
     .then(data => data)
     .catch(err => {
         console.log(`There's a problem initializing admin user. Error: ${err}`)
