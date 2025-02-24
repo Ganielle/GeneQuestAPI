@@ -240,7 +240,7 @@ exports.getlockedstages = async (req, res) => {
     let level2Locked = true;
 
     lockeddata.forEach(tempdata => {
-        const { _id, owner, level, stage, locked } = tempdata;
+        const { _id, owner, level, stage, locked, played } = tempdata;
 
         if (!data[`level${level}`]) {
             data[`level${level}`] = {};
@@ -249,7 +249,8 @@ exports.getlockedstages = async (req, res) => {
         data[`level${level}`][stage] = {
             id: _id,
             owner: owner,
-            locked: locked
+            locked: locked,
+            played: played
         };
 
         // If any stage is unlocked (locked === 0), mark level as unlocked
@@ -287,6 +288,13 @@ exports.unlockstages = async (req, res) => {
             return res.status(400).json({message: "bad-request", data: "There's a problem with the server. Please try again later"})
         })
     }
+
+    await Unlock.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id), level: level, stage: (stage - 1)}, {played: 1})
+    .catch(err => {
+        console.log(`There's a problem saving played unlock data for id: ${id}  level: ${level}  stage: ${stage}. Error: ${err}`)
+
+        return res.status(400).json({message: "bad-request", data: "There's a problem with the server. Please try again later"})
+    })
 
     await Score.findOneAndUpdate({owner: new mongoose.Types.ObjectId(id)}, {$inc: {amount: score}})
     .catch(err => {

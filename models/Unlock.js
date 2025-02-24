@@ -15,6 +15,10 @@ const UnlockSchema = new mongoose.Schema(
         },
         locked: {
             type: Number
+        },
+        played: {
+            type: Number,
+            default: 0
         }
     },
     {
